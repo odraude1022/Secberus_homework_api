@@ -12,18 +12,18 @@ async def secret(session, headers, num):
     async with session.get(f'http://localhost:5000/api/secret{num}', headers=headers) as resp:
         if(resp.status == 401):
             headers = await authenticate(login, session)
-            await secret(session, headers, num)
+            return(await secret(session, headers, num))
         else:
             with open(f'secret{num}.txt', 'w') as f:
                 answer = (await resp.json()).get("answer")
                 f.write(answer)
-                print(answer)
-                
+                return answer
+
 async def solution():
     async with aiohttp.ClientSession() as session:
         headers = await authenticate(login, session)
-        await secret(session, headers, 1)
-        await secret(session, headers, 2)
-        await secret(session, headers, 3)
+        print(await secret(session, headers, 1))
+        print(await secret(session, headers, 2))
+        print(await secret(session, headers, 3))
 
 asyncio.run(solution())

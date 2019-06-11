@@ -8,45 +8,22 @@ async def authenticate(login, session):
         token = (await resp.json()).get("access_token")
         return {"Authorization": f"Bearer {token}"}
 
-async def secret1(session, headers):
-    async with session.get('http://localhost:5000/api/secret1', headers=headers) as resp:
+async def secret(session, headers, num):
+    async with session.get(f'http://localhost:5000/api/secret{num}', headers=headers) as resp:
         if(resp.status == 401):
             headers = await authenticate(login, session)
-            await secret1(session, headers)
+            await secret(session, headers, num)
         else:
-            with open('secret1.txt', 'w') as f:
-                answer1 = (await resp.json()).get("answer")
-                f.write(answer1)
-                print(answer1)
-
-async def secret2(session, headers):
-    async with session.get('http://localhost:5000/api/secret2', headers=headers) as resp:
-        if(resp.status == 401):
-            headers = await authenticate(login, session)
-            await secret2(session, headers)
-        else:
-            with open('secret2.txt', 'w') as f:
-                answer2 = (await resp.json()).get("answer")
-                f.write(answer2)
-                print(answer2)
-
-async def secret3(session, headers):
-    async with session.get('http://localhost:5000/api/secret3', headers=headers) as resp:
-        if(resp.status == 401):
-            headers = await authenticate(login, session)
-            await secret3(session, headers)
-        else:
-            with open('secret3.txt', 'w') as f:
-                answer3 = (await resp.json()).get("answer")
-                f.write(answer3)
-                print(answer3)
-
-
+            with open(f'secret{num}.txt', 'w') as f:
+                answer = (await resp.json()).get("answer")
+                f.write(answer)
+                print(answer)
+                
 async def solution():
     async with aiohttp.ClientSession() as session:
         headers = await authenticate(login, session)
-        await secret1(session, headers)
-        await secret2(session, headers)
-        await secret3(session, headers)
+        await secret(session, headers, 1)
+        await secret(session, headers, 2)
+        await secret(session, headers, 3)
 
 asyncio.run(solution())
